@@ -18,7 +18,7 @@
 const i2s_port_t I2S_PORT = I2S_NUM_0;
 const int BLOCK_SIZE = 64;
 
-const int SAMPLE_RATE = 10240;
+const int SAMPLE_RATE = 44100;
 
 TaskHandle_t FFT_Task;
 
@@ -104,11 +104,16 @@ void FFTcode( void * parameter) {
     } // for()
 
 
-    /* This FFT post processing is a DIY endeavour. What we really need is someone with sound engineering expertise to do a great job here AND most importantly, that the animations look GREAT as a result.
+    /* This FFT post processing is a DIY endeavour. What we really need is
+     * someone with sound engineering expertise to do a great job here AND
+     * most importantly, that the animations look GREAT as a result.
      *
-     * Andrew's updated mapping of 256 bins down to the 16 result bins with Sample Freq = 10240, samples = 512 and some overlap.
-     * Based on testing, the lowest/Start frequency is 60 Hz (with bin 3) and a highest/End frequency of 5120 Hz in bin 255.
-     * Now, Take the 60Hz and multiply by 1.320367784 to get the next frequency and so on until the end. Then detetermine the bins.
+     * Andrew's updated mapping of 256 bins down to the 16 result bins with
+     * Sample Freq = 10240, samples = 512 and some overlap.
+     * Based on testing, the lowest/Start frequency is 60 Hz (with bin 3) and
+     * a highest/End frequency of 5120 Hz in bin 255.
+     * Now, Take the 60Hz and multiply by 1.320367784 to get the next
+     * frequency and so on until the end. Then detetermine the bins.
      * End frequency = Start frequency * multiplier ^ 16
      * Multiplier = (End frequency/ Start frequency) ^ 1/16
      * Multiplier = 1.320367784
@@ -162,13 +167,14 @@ void setupAudio() {
   esp_err_t err;
   const i2s_config_t i2s_config = {
     .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_RX),  // Receive, not transfer
-    .sample_rate = SAMPLE_RATE*2,                       // 10240 * 2 (20480) Hz
-    .bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT,       // could only get it to work with 32bits
+    .sample_rate = SAMPLE_RATE,
+    .bits_per_sample = i2s_bits_per_sample_t(16),       // could only get it to work with 32bits
     .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,        // LEFT when pin is tied to ground.
-    .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB),
-    .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,           // Interrupt level 1
+    .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_I2S),
+    .intr_alloc_flags = 0,
     .dma_buf_count = 8,                                 // number of buffers
-    .dma_buf_len = BLOCK_SIZE                           // samples per buffer
+    .dma_buf_len = BLOCK_SIZE,                           // samples per buffer
+    .use_apll = false
   };
   const i2s_pin_config_t pin_config = {
     .bck_io_num = I2S_SCK,      // BCLK aka SCK
@@ -199,7 +205,7 @@ void setupAudio() {
   size_t num_bytes_read = 0;
 
   esp_err_t result = i2s_read(I2S_PORT, &samples, BLOCK_SIZE, &num_bytes_read, portMAX_DELAY);
-  
+
   /*int num_bytes_read = i2s_read_bytes(I2S_PORT,
                                       (char *)samples,
                                       BLOCK_SIZE,     // the doc says bytes, but its elements.
