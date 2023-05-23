@@ -13,5 +13,11 @@
  - FastLED library v3.5.0 : [Github](https://github.com/FastLED/FastLED/releases/tag/3.5.0)
  - ArduinoFFT library v1.6 : [Github](https://github.com/kosme/arduinoFFT/releases/tag/v1.6)
 
-
+## Wiring diagram
 ![Wiring diagram](/Schematics/Wiring_diagram.png)
+
+## To do
+ - Fix flickering when low brightness
+ - Add support of mode switch
+ - Fix 3D designs
+ - Add 3D parts in repo
