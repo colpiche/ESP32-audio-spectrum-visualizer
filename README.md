@@ -19,5 +19,7 @@
 ## To do
  - Fix flickering when low brightness
  - Add support of mode switch
+ - Update diagram consequently
  - Fix 3D designs
  - Add 3D parts in repo
+ - Clean repo
